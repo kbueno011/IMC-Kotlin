@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -31,11 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import br.senai.sp.jandira.bmi.R
 
 
 @Composable
-fun BMIResultScreen (modifier: Modifier = Modifier) {
+fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
 
     var nomeState = remember {
         mutableStateOf(value = "")
@@ -129,7 +131,7 @@ fun BMIResultScreen (modifier: Modifier = Modifier) {
                         Text(
                             text = stringResource(R.string.status),
                             fontSize = 27.sp,
-                            modifier = modifier
+                             modifier = Modifier
                                 .padding(15.dp)
 
                         )
@@ -159,7 +161,7 @@ fun BMIResultScreen (modifier: Modifier = Modifier) {
                                         fontSize = 22.sp
                                     )
                                 }
-                                
+
                                 VerticalDivider(
                                     modifier = Modifier
 
@@ -218,12 +220,18 @@ fun BMIResultScreen (modifier: Modifier = Modifier) {
                     ) {
 
                     }
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                    )
                     Column(
                         modifier = Modifier
                             .weight(0.7f)
                     ) {
                         Button(
-                            onClick = {},
+                            onClick = {
+                                controleDeNavegacao?.navigate(route = "UserData")
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 40.dp)
@@ -260,5 +268,5 @@ fun BMIResultScreen (modifier: Modifier = Modifier) {
 @Preview(showSystemUi = true)
 @Composable
 private fun BMIResultScreenPreview() {
-    BMIResultScreen()
+    BMIResultScreen(null)
 }
