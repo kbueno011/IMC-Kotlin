@@ -1,16 +1,9 @@
 package br.senai.sp.jandira.bmi.screens
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -27,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,13 +29,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import br.senai.sp.jandira.bmi.R
 
-
 @Composable
 fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
 
-    var nomeState = remember {
-        mutableStateOf(value = "")
-    }
+    val context = LocalContext.current
+    val userFile = context.getSharedPreferences("user_file", Context.MODE_PRIVATE)
+
+    // Recuperando os valores salvos no SharedPreferences
+    val idade = userFile.getInt("user_age", 0) // Default para 0 caso não tenha sido salvo
+    val peso = userFile.getInt("user_weight", 0) // Default para 0
+    val altura = userFile.getInt("user_height", 0) // Default para 0
+
+    // Estado para os campos de exibição (valores recuperados do SharedPreferences)
+    var idadeState = remember { mutableStateOf(idade.toString()) }
+    var pesoState = remember { mutableStateOf(peso.toString()) }
+    var alturaState = remember { mutableStateOf(altura.toString()) }
 
     Box(
         modifier = Modifier
@@ -50,15 +52,13 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                 listOf(
                     Color(0xFF071A83),
                     Color(0xFF0232FF)
-
                 )
             ))
-    ){
-        Column (
-            modifier = Modifier
-                .fillMaxSize(),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
 
             Text(
                 text = stringResource(R.string.result),
@@ -72,7 +72,6 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
 
             Card(
                 modifier = Modifier
-
                     .fillMaxSize()
                     .height(150.dp)
                     .weight(9f),
@@ -83,26 +82,23 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
                 )
-
             ) {
-                Column (
-                    Modifier.fillMaxSize()
+                Column(
+                    Modifier
+                        .fillMaxSize()
                         .padding(10.dp)
-
                 ) {
                     Column(
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .padding(10.dp)
                             .weight(1.2f),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceBetween
-
                     ) {
-                        Card (
+                        Card(
                             modifier = Modifier
-                                .size(120.dp)
-                                ,
-
+                                .size(120.dp),
                             shape = CircleShape,
                             border = BorderStroke(
                                 width = 5.dp,
@@ -115,7 +111,6 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                                 )
                             )
                         ) {
-
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.fillMaxSize()
@@ -126,18 +121,16 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                                     fontWeight = FontWeight.Bold
                                 )
                             }
-
                         }
                         Text(
                             text = stringResource(R.string.status),
                             fontSize = 27.sp,
-                             modifier = Modifier
+                            modifier = Modifier
                                 .padding(15.dp)
-
                         )
                         Card(
-                           modifier = Modifier
-                               .height(90.dp)
+                            modifier = Modifier
+                                .height(90.dp)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -149,23 +142,20 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
                                         .weight(1f)
-
                                 ) {
                                     Text(
                                         text = stringResource(R.string.age),
                                         fontSize = 22.sp
                                     )
                                     Text(
-                                        text = stringResource(R.string.idade),
+                                        text = idadeState.value, // Preenchendo o valor da idade
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 22.sp
                                     )
                                 }
 
-                                VerticalDivider(
-                                    modifier = Modifier
+                                VerticalDivider()
 
-                                )
                                 Column(
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -175,18 +165,16 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                                     Text(
                                         text = stringResource(R.string.W),
                                         fontSize = 22.sp
-
                                     )
                                     Text(
-                                        text = stringResource(R.string.kg),
+                                        text = pesoState.value, // Preenchendo o valor do peso
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 22.sp
-
                                     )
                                 }
-                                VerticalDivider(
 
-                                )
+                                VerticalDivider()
+
                                 Column(
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,21 +184,17 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                                     Text(
                                         text = stringResource(R.string.H),
                                         fontSize = 22.sp
-
                                     )
                                     Text(
-                                        text = stringResource(R.string.cm),
+                                        text = alturaState.value, // Preenchendo o valor da altura
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 22.sp
-
                                     )
                                 }
                             }
                         }
-
-
-
                     }
+
                     Box(
                         modifier = Modifier
                             .weight(0.9f)
@@ -218,12 +202,13 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                             .fillMaxSize()
                             .padding(horizontal = 20.dp)
                     ) {
-
                     }
+
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(top = 10.dp)
                     )
+
                     Column(
                         modifier = Modifier
                             .weight(0.7f)
@@ -235,12 +220,10 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 40.dp)
-                                .height(60.dp)
-                                ,
+                                .height(60.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF133EB9),
-
-                                )
+                                containerColor = Color(0xFF133EB9)
+                            )
                         ) {
                             Text(
                                 text = stringResource(R.string.calc),
@@ -251,19 +234,9 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                     }
                 }
             }
-
         }
     }
-
 }
-
-
-
-
-
-
-
-
 
 @Preview(showSystemUi = true)
 @Composable

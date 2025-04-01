@@ -1,17 +1,10 @@
 package br.senai.sp.jandira.bmi.screens
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -46,9 +40,22 @@ import br.senai.sp.jandira.bmi.R
 @Composable
 fun UserScreen(controleDeNavegacao: NavHostController?) {
 
-    var nomeState = remember {
-        mutableStateOf(value = "")
-    }
+    val context = LocalContext.current
+    val userFile = context.getSharedPreferences("user_file", Context.MODE_PRIVATE)
+    val editor = userFile.edit()
+
+    val userName = userFile.getString("user_name", "User not found")
+
+    // States para os campos de entrada
+    var nomeState = remember { mutableStateOf("") }
+    var idadeState = remember { mutableStateOf("") }
+    var pesoState = remember { mutableStateOf("") }
+    var alturaState = remember { mutableStateOf("") }
+
+    val selectedColorState = remember { mutableStateOf(Color(0xFF0232FF)) }
+    val unselectedColorState = remember { mutableStateOf(Color.LightGray) }
+    val isMaleClicked = remember { mutableStateOf(false) }
+    val isFemaleClicked = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -57,27 +64,25 @@ fun UserScreen(controleDeNavegacao: NavHostController?) {
                 listOf(
                     Color(0xFF071A83),
                     Color(0xFF0232FF)
-
                 )
             ))
-    ){
-        Column (
-            modifier = Modifier
-                .fillMaxSize(),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
 
             Text(
-                text = stringResource(R.string.hi),
+                text = "${stringResource(R.string.hi)}, $userName!",
                 fontSize = 27.sp,
                 color = Color.White,
                 modifier = Modifier
                     .padding(30.dp)
                     .weight(1f)
             )
+
             Card(
                 modifier = Modifier
-
                     .fillMaxSize()
                     .height(150.dp)
                     .weight(9f),
@@ -88,71 +93,25 @@ fun UserScreen(controleDeNavegacao: NavHostController?) {
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
                 )
-
             ) {
 
-                Column (
-
-
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(30.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-
-                    Row (
+                    Row(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
-
                     ) {
-                        Column (
+                        // Coluna para imagem do usuário feminino
+                        Column(
                             modifier = Modifier
                                 .weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Card (
-                                modifier = Modifier
-                                    .size(120.dp),
-                                shape = CircleShape,
-                                border = BorderStroke(
-                                    width = 2.dp,
-                                    brush = Brush.horizontalGradient(
-                                        listOf(
-                                            Color(0xFF021EC4),
-                                            Color(0xFFCFD0D9),
-                                            Color(0xFF9C0DD5),
-                                        )
-                                    )
-                                )
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.woman),
-                                    contentDescription = "",
-                                    modifier = Modifier
-
-
-                                )
-                            }
-
-                            Button(
-                                onClick = {},
-                                shape = RoundedCornerShape(30.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF9C0DD5),
-
-                                )
-
-                            )
-                            {
-                                Text(text = stringResource(R.string.male))
-                            }
-                        }
-                        Column (
-                            modifier = Modifier
-                                .weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Card (
+                            Card(
                                 modifier = Modifier
                                     .size(120.dp),
                                 shape = CircleShape,
@@ -171,141 +130,164 @@ fun UserScreen(controleDeNavegacao: NavHostController?) {
                                     painter = painterResource(R.drawable.homem),
                                     contentDescription = "",
                                     modifier = Modifier
-
-
                                 )
                             }
 
                             Button(
-                                onClick = {},
+                                onClick = {
+                                    isMaleClicked.value = true
+                                    isFemaleClicked.value = false
+                                    // Salvando o nome do usuário
+                                    editor.putString("user_name", nomeState.value)
+                                    editor.apply()
+                                },
                                 shape = RoundedCornerShape(30.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF051788),
+                                    containerColor = if (isMaleClicked.value)selectedColorState.value else unselectedColorState.value)
+
+                            ) {
+                                Text(text = stringResource(R.string.male))
+                            }
+                        }
+                        // Coluna para imagem do usuário masculino
+                        Column(
+                            modifier = Modifier
+                                .weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Card(
+                                modifier = Modifier
+                                    .size(120.dp),
+                                shape = CircleShape,
+                                border = BorderStroke(
+                                    width = 2.dp,
+                                    brush = Brush.horizontalGradient(
+                                        listOf(
+                                            Color(0xFF021EC4),
+                                            Color(0xFFCFD0D9),
+                                            Color(0xFF9C0DD5),
+                                        )
+                                    )
                                 )
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.woman),
+                                    contentDescription = "",
+                                    modifier = Modifier
                                 )
-                            {
+                            }
+
+                            Button(
+                                onClick = {
+                                    isMaleClicked.value = false
+                                    isFemaleClicked.value = true
+                                },
+                                shape = RoundedCornerShape(30.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isFemaleClicked.value)selectedColorState.value else unselectedColorState.value)
+                            ) {
                                 Text(text = stringResource(R.string.female))
                             }
                         }
-                        }
+                    }
 
-                        Column (
+                    // Campos de entrada
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = idadeState.value,
+                            onValueChange = { idadeState.value = it },
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(bottom = 20.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            label = {
+                                Text(text = stringResource(R.string.age))
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Numbers,
+                                    contentDescription = "",
+                                    tint = Color.Blue
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            )
                         )
-                        {
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {},
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 20.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.age)
-                                    )
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Numbers,
-                                        contentDescription = "",
-                                        tint = Color.Blue
 
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Next
+                        OutlinedTextField(
+                            value = pesoState.value,
+                            onValueChange = { pesoState.value = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 20.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            label = {
+                                Text(text = stringResource(R.string.width))
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Balance,
+                                    contentDescription = "",
+                                    tint = Color.Blue
                                 )
-
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
                             )
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {},
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 20.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.width)
-                                    )
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Balance,
-                                        contentDescription = "",
-                                        tint = Color.Blue
+                        )
 
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Next
+                        OutlinedTextField(
+                            value = alturaState.value,
+                            onValueChange = { alturaState.value = it },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            label = {
+                                Text(text = stringResource(R.string.heigth))
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Height,
+                                    contentDescription = "",
+                                    tint = Color.Blue
                                 )
-
-
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
                             )
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {},
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                shape = RoundedCornerShape(16.dp),
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.heigth)
-                                    )
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Height,
-                                        contentDescription = "",
-                                        tint = Color.Blue
+                        )
+                    }
 
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Done
-                                )
-
-                            )
-                        }
-
+                    // Botão para calcular e salvar as informações
                     Button(
                         onClick = {
+                            // Salvando todas as informações inseridas
+                            editor.putInt("user_age", idadeState.value.toInt())
+                            editor.putInt("user_weight", pesoState.value.toInt())
+                            editor.putInt("user_height", alturaState.value.toInt())
+                            editor.apply()
+
+                            // Navegar para a próxima tela
                             controleDeNavegacao?.navigate(route = "BMIresult")
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF133EB9),
-
-                            )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.calculate)
+                            containerColor = Color(0xFF133EB9)
                         )
-                    }
-
-                    }
-
-                    }
-
+                    ) {
+                        Text(text = stringResource(R.string.calculate))
                     }
                 }
-
             }
-
-
-
-
-
-
-
+        }
+    }
+}
 
 @Preview(showSystemUi = true)
 @Composable
