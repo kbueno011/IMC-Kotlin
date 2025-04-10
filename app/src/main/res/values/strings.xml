@@ -21,6 +21,13 @@
     <string name="cm">179 cm</string>
     <string name="calc">New Calc</string>
 
+    <string name="under_weight">You are below yout ideal weight</string>
+    <string name="normal_weight">You are normal body weight</string>
+    <string name="over_weight">You are slightly overweight</string>
+    <string name="class1_weight">You have Class I obesity</string>
+    <string name="class2_weight">You have Class II obesity</string>
+    <string name="class3_weight">You have Class III obesity</string>
+
 
 
 

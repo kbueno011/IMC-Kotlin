@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import br.senai.sp.jandira.bmi.R
+import br.senai.sp.jandira.bmi.model.bmiCalculator
+import br.senai.sp.jandira.bmi.screens.components.BmiLevels
+import java.util.Locale
 
 @Composable
 fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
@@ -45,6 +48,7 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
     var pesoState = remember { mutableStateOf(peso.toString()) }
     var alturaState = remember { mutableStateOf(altura.toString()) }
 
+    val resultBmi = bmiCalculator(peso, altura.toDouble())
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -102,28 +106,25 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                             shape = CircleShape,
                             border = BorderStroke(
                                 width = 5.dp,
-                                brush = Brush.horizontalGradient(
-                                    listOf(
-                                        Color(0xFF021EC4),
-                                        Color(0xFF3E4E80),
-                                        Color(0xFF9C0DD5),
-                                    )
+                                color = resultBmi.color
                                 )
-                            )
+
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.fillMaxSize()
+
                             ) {
+                                val bmiValue = resultBmi.bmiValues.second
                                 Text(
-                                    text = stringResource(R.string.imc),
+                                    text = String.format(Locale.getDefault(), format = "%.1f", bmiValue),
                                     fontSize = 40.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                         }
                         Text(
-                            text = stringResource(R.string.status),
+                            text = resultBmi.bmiValues.first,
                             fontSize = 27.sp,
                             modifier = Modifier
                                 .padding(15.dp)
@@ -195,13 +196,24 @@ fun BMIResultScreen(controleDeNavegacao: NavHostController?) {
                         }
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .weight(0.9f)
-                            .background(color = Color.Black)
-                            .fillMaxSize()
-                            .padding(horizontal = 20.dp)
-                    ) {
+                    Column (modifier = Modifier
+                        .weight(0.9f)
+                        .background(color = Color.Black)
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp))
+
+                    {
+
+                        BmiLevels()
+                        BmiLevels()
+                        BmiLevels()
+                        BmiLevels()
+                        BmiLevels()
+                        BmiLevels()
+
+                    }
+
+
                     }
 
                     HorizontalDivider(
